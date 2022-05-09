@@ -1,0 +1,9 @@
+{
+    "database": {
+        "engine": "mysql",
+        "database_host": "localhost",
+        "database_username": "antonio",
+        "database_password": "antonio",
+        "database_name": "node_app"
+    }
+}
