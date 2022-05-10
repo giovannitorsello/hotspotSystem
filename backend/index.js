@@ -1,10 +1,16 @@
 var config = require("./config.js").load();
-const createError = require("http-errors");
+const fs = require("fs");
+const http = require("http");
+const https = require("https");
+
 const express = require("express");
-const session = require("express-session");
-const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+
+const createError = require("http-errors");
+const session = require("express-session");
+const path = require("path");
+
 var passport = require("passport");
 var GoogleStrategy = require("passport-google-oidc");
 
@@ -19,29 +25,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: "SECRET" })); // session secret
 
 ////////////////// CORS SECTION /////////////////////////
-var allowedOrigins = ["http://localhost:3000", "http://localhost:8080, http://hostspotserver.wifinetcom.net:3000"];
+var allowedOrigins = ["http://localhost:3000", "http://localhost:8080", "https://" + config.server.domain];
 app.use(cors(allowedOrigins));
 
 ////////////////// PASSPORT SECTON WILL BE MOVED IN OTHER FILE /////////////
 passport.use(
-  new GoogleStrategy(
-    {
-      clientID: "hotspotsystem",
-      clientSecret: "AIzaSyA5yU2-b_jCX5BdAWcjX2uGSyH9QeUbW6I",
-      callbackURL: "https://5.83.124.101:3000/oauth2/redirect/google",
-    },
-    function (issuer, profile, cb) {
-      console.log("Issuer is: ", issuer);
-      console.log("Profile is: ", profile);
-      console.log("Callback is: ", cb);
-    }
-  )
+  new GoogleStrategy(config.passport.google, function (issuer, profile, cb) {
+    console.log("Issuer is: ", issuer);
+    console.log("Profile is: ", profile);
+    console.log("Callback is: ", cb);
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 ////////////////// PASSPORT SECTON WILL BE MOVED IN OTHER FILE /////////////
-
-app.use("/api", router);
 
 // Gestione degli errori
 /*app.use((err, req, res, next) => {
@@ -51,9 +48,28 @@ app.use("/api", router);
   res.status(err.statusCode).json({ message: err.message });
 });*/
 
-app.listen(3000, () => console.log("Il server è attivo sulla porta 3000"));
+//general api route
+app.use("/api", router);
 
-app.get("/authenticate/google", passport.authenticate("google", { scope: ["email"] }), (req, res) => {
-  console.log(req);
-  res.send(req.user);
-});
+//Passport authentication route for google
+app.get("/authenticate/google", passport.authenticate("google", { scope: ["email"] }));
+
+//Passport authentication route for facebook
+app.get("/authenticate/facebook", passport.authenticate("facebook", { scope: ["email"] }));
+
+//Create server for listening
+try {
+  var httpServer = http.createServer(app);
+  var credentials = {
+    key: fs.readFileSync(process.cwd() + config.server.domain_key, "utf8"),
+    cert: fs.readFileSync(process.cwd() + config.server.domain_cert, "utf8"),
+  };
+  var httpsServer = https.createServer(credentials, app);
+
+  httpServer.listen(config.server.http_port);
+  httpsServer.listen(config.server.https_port);
+
+  console.log("Servers started", config.server);
+} catch (error) {
+  console.log("Error on starting servers", error);
+}

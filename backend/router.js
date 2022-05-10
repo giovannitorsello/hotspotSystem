@@ -3,13 +3,9 @@ const router = express.Router();
 const db = require("./dbConfig");
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
-
-var passport = require("passport");
-var GoogleStrategy = require("passport-google-oidc");
-const { send } = require("process");
 const { log } = require("console");
 
-////////////////Begin routes ///////////////////
+//////////////// Begin routes ///////////////////
 router.post("/register", (req, res, next) => {
   if (req.body.firstName.length == 0 || req.body.lastName.length == 0 || req.body.email.length == 0 || req.body.phone.length == 0) {
     res.send({ msg: "Contrallare i campi" });
@@ -61,6 +57,10 @@ router.post("/get-user", (req, res, next) => {
 
     return res.send({ error: false, data: results[0], message: "Fetch Successfully." });
   });
+});
+
+router.get("/google/redirect", (req, res, next) => {
+  res.send("This route will be called by google OAuth2");
 });
 
 module.exports = router;
