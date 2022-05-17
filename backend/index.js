@@ -1,44 +1,77 @@
 var config = require("./config.js").load();
-const fs = require("fs");
-const http = require("http");
-const https = require("https");
-
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-
 const createError = require("http-errors");
+const express = require("express");
 const session = require("express-session");
 const path = require("path");
-
-var passport = require("passport");
-var GoogleStrategy = require("passport-google-oidc");
-
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const passport = require("passport");
 const router = require("./router.js");
 const database = require("./dbConfig.js");
+const wsServer = require("./wsServer.js");
 
+require("./auth");
 const app = express();
+
+function isLogged(req, res, next) {
+  req.user ? next() : res.sendStatus(401);
+}
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: "SECRET" })); // session secret
+app.use(session({ secret: "SECRET" }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-////////////////// CORS SECTION /////////////////////////
-var allowedOrigins = ["http://localhost:3000", "http://localhost:8080", "https://" + config.server.domain];
+var allowedOrigins = ["http://localhost:3000", "http://localhost:8080, http://hostspotserver.wifinetcom.net:3000"];
 app.use(cors(allowedOrigins));
 
-////////////////// PASSPORT SECTON WILL BE MOVED IN OTHER FILE /////////////
-passport.use(
-  new GoogleStrategy(config.passport.google, function (issuer, profile, cb) {
-    console.log("Issuer is: ", issuer);
-    console.log("Profile is: ", profile);
-    console.log("Callback is: ", cb);
+app.use("/api", router);
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["email", "profile"],
   })
 );
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-////////////////// PASSPORT SECTON WILL BE MOVED IN OTHER FILE /////////////
+
+app.get(
+  "/auth/facebook",
+  passport.authenticate("facebook", {
+    scope: ["email", "profile"],
+  })
+);
+
+app.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/protected",
+    failureRedirect: "/auth/failure",
+  })
+);
+
+app.get(
+  "/facebook/callback",
+  passport.authenticate("facebook", {
+    successRedirect: "/protected",
+    failureRedirect: "/auth/failure",
+  })
+);
+
+app.get("/auth/failure", (req, res) => {
+  res.send("somenting go wrong");
+});
+
+app.get("/protected", isLogged, (req, res) => {
+  res.send(`hello ${req.user.displayName}`);
+});
+
+app.get("/logout", (req, res) => {
+  req.logOut();
+  req.session.destroy();
+  res.send("goodbye");
+});
 
 // Gestione degli errori
 /*app.use((err, req, res, next) => {
@@ -48,28 +81,7 @@ app.use(passport.session()); // persistent login sessions
   res.status(err.statusCode).json({ message: err.message });
 });*/
 
-//general api route
-app.use("/api", router);
+app.listen(config.server.restPort, () => console.log("Il server è attivo sulla porta 3000"));
 
-//Passport authentication route for google
-app.get("/authenticate/google", passport.authenticate("google", { scope: ["email"] }));
-
-//Passport authentication route for facebook
-app.get("/authenticate/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-
-//Create server for listening
-try {
-  var httpServer = http.createServer(app);
-  var credentials = {
-    key: fs.readFileSync(process.cwd() + config.server.domain_key, "utf8"),
-    cert: fs.readFileSync(process.cwd() + config.server.domain_cert, "utf8"),
-  };
-  var httpsServer = https.createServer(credentials, app);
-
-  httpServer.listen(config.server.http_port);
-  httpsServer.listen(config.server.https_port);
-
-  console.log("Servers started", config.server);
-} catch (error) {
-  console.log("Error on starting servers", error);
-}
+//start web soicket server
+wsServer.startServer(app);

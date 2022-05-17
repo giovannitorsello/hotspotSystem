@@ -1,14 +1,27 @@
-var express = require('express');
+var configConn= require('./config.json');
 var passport = require('passport');
-var GoogleStrategy = require('passport-google-oidc');
-var db = require('./dbConfig');
+const config = require('./config');
+var GoogleStrategy = require('passport-google-oauth2').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 
-var router = express.Router();
 
-router.get('/login', function(req, res, next) {
-  res.render('login');
+passport.use(
+  new GoogleStrategy(configConn.google,
+   function(request, accessToken, refreshToken, profile, done){
+     return done(null, profile)
+   }
+  )
+);
+passport.use(new FacebookStrategy(configConn.facebook,
+function(request, accessToken, refreshToken, profile, done){
+  return done(null, profile)
+}
+));
+
+
+passport.serializeUser(function(user,done){
+  done(null,user);
 });
-
-router.get('/login/federated/google', passport.authenticate('google'));
-
-module.exports = router;
+passport.deserializeUser(function(user,done){
+  done(null,user);
+});

@@ -33,9 +33,7 @@
     <div class="footer">
       <p>NON HAI UN ACCOUNT? <router-link to="/register">Registrati</router-link></p>
     </div>
-    <div id="111">
-      <p>{{ this.users.msg }}</p>
-    </div>
+   
   </div>
 </template>
 <script>
