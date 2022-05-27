@@ -1,11 +1,12 @@
 {
     "server": {
         "restPort": 3000,
+        "restSSLPort": 3443,
         "webSocketPort": 2021,
         "maxConnections": 10000,
         "maxPayloadWebSocket": 4096,
-        "certificateSSL": "/certs/hotspotwfndev.wfn.ovh/fullchain.pem",
-        "privateKeySSL": "/certs/hotspotwfndev.wfn.ovh/privkey.pem"
+        "certificateSSL": "/certs/hotspottordev.wfn.ovh/fullchain.pem",
+        "privateKeySSL": "/certs/hotspottordev.wfn.ovh/privkey.pem"
     },
     "database": {
         "engine": "mysql",
@@ -15,15 +16,16 @@
         "database_name": "node_app"
     },
     "google": {
-        "clientID": "103575192227-6lja559egtorr3vnr4tl15t55jaq5a68.apps.googleusercontent.com",
-        "clientSecret": "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",
-        "callbackURL": "http://localhost:3000/google/callback",
+        "clientID": "513774142824-t78vgfbfhcsba9katnv64uve4u00hb2f.apps.googleusercontent.com",
+        "clientSecret": "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",
+        "callbackURL": "https://hotspottordev.wfn.ovh/google/callback",
         "passReqToCallback": true
     },
     "facebook": {
         "clientID": "529063895382205",
         "clientSecret": "5fdf8f61faf72389318c903a2531f53d",
-        "callbackURL": "http://localhost:3000/facebook/callback",
-        "profileFields": ["id", "name", "displayName"]
+        "callbackURL": "https://hotspottordev.wfn.ovh/facebook/callback",
+        "profileFields": ["id", "name", "displayName"],
+        "passReqToCallback": true
     }
 }
