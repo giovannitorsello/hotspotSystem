@@ -9,9 +9,10 @@ var conn = mysql.createConnection({
 
 conn.connect(function (err) {
   if (err) console.log("Check database parameters, database connection error.");
-  else console.log("Database connesso correttamente");
+  else console.log("Database OK");
 });
 
 module.exports = conn;
+
 
 //grant all privileges on node_app.* to 'antonio'@'localhost' identified by "antonio";

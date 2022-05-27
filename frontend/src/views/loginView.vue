@@ -8,7 +8,7 @@
             id="email"
             name="email"
             type="text"
-            v-model="users.username"
+            v-model="users.email"
             placeholder="Email Address"
           />
         </div>
@@ -33,9 +33,9 @@
     <div class="footer">
       <p>NON HAI UN ACCOUNT? <router-link to="/register">Registrati</router-link></p>
     </div>
-   
   </div>
 </template>
+
 <script>
 import * as Vue from "vue";
 import axios from "axios";
@@ -43,6 +43,7 @@ import App from '@/App.vue'
 import VueAxios from "vue-axios";
 const app = Vue.createApp(App);
 app.use(VueAxios, axios);
+axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 
 import SocialLogin from "../components/socialLogin.vue";
 export default {
@@ -54,28 +55,28 @@ export default {
   data() {
     return {
       users: {
-        email: null,
-        password: null,
+        email: "",
+        password: "",
         msg:'',
       },
     };
   },
 
   methods: {
-    postData() {
-
-      axios.post("http://localhost:3000/api/login", this.users)
-      .then(response =>
-     alert(response.data.msg)
-       
-      )
-      .catch(error =>
-      alert(error.response.data.msg))
-     
-
-
+   postData() {
+      let payload = {
+        email: this.users.email,
+        password: this.users.password,
+      };
+      axios
+        .post("http://localhost:3000/api/login", payload)
+        .then(function (response) {
+          console.log(response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
   },
- 
 };
 </script>

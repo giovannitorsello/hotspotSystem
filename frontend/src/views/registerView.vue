@@ -38,12 +38,11 @@
           Crea account
         </button>
       </div>
-      <div class="login-choice"><span>O registrati con</span></div>
       <SocialSignUp />
       <div>
         <p class="center">
           Accetti i nostri termini e condizioni per il trattamento dei dati
-          <a href="#">Termini e condizioni</a>.
+          <a href="https://www.wifinetcom.net/wp-content/uploads/2022/03/informativa_privacy.pdf">Termini e condizioni</a>.
         </p>
       </div>
     </div>
@@ -92,13 +91,12 @@ export default {
         .post("http://localhost:3000/api/register", payload)
         .then(function (response) {
           console.log(response.data);
-          
-          alert(response.data.msg)
-         
+
+          alert(response.data.msg);
         })
         .catch(function (error) {
           console.log(error);
-         alert(error.response.data.msg);
+          alert(error.response.data.msg);
         });
     },
   },
