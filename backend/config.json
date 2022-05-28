@@ -5,6 +5,7 @@
         "webSocketPort": 2021,
         "maxConnections": 10000,
         "maxPayloadWebSocket": 4096,
+        "sessionSecret": "sdjalksdjlaskjd9834edn9daaslkdj98a9s8dj",
         "certificateSSL": "/certs/hotspottordev.wfn.ovh/fullchain.pem",
         "privateKeySSL": "/certs/hotspottordev.wfn.ovh/privkey.pem"
     },
@@ -15,17 +16,20 @@
         "database_password": "antonio",
         "database_name": "node_app"
     },
-    "google": {
-        "clientID": "513774142824-t78vgfbfhcsba9katnv64uve4u00hb2f.apps.googleusercontent.com",
-        "clientSecret": "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",
-        "callbackURL": "https://hotspottordev.wfn.ovh/google/callback",
-        "passReqToCallback": true
-    },
-    "facebook": {
-        "clientID": "529063895382205",
-        "clientSecret": "5fdf8f61faf72389318c903a2531f53d",
-        "callbackURL": "https://hotspottordev.wfn.ovh/facebook/callback",
-        "profileFields": ["id", "name", "displayName"],
-        "passReqToCallback": true
+    "passport": {
+        "google": {
+            "clientID": "513774142824-t78vgfbfhcsba9katnv64uve4u00hb2f.apps.googleusercontent.com",
+            "clientSecret": "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",
+            "callbackURL": "https://hotspottordev.wfn.ovh/google/callback",
+            "passReqToCallback": true
+        },
+        "facebook": {
+            "clientID": "529063895382205",
+            "clientSecret": "5fdf8f61faf72389318c903a2531f53d",
+            "callbackURL": "https://hotspottordev.wfn.ovh/facebook/callback",
+            "profileFields": ["id", "name", "displayName"],
+            "passReqToCallback": true
+
+        }
     }
 }

@@ -19,10 +19,6 @@
         </div>
       </div>
     </div>
-
-    <!--div id="authentication_form" v-if="step == 1">
-      <iframe height="400" width="600" :src="socialUrl"></iframe>
-    </div-->
   </div>
 </template>
 
@@ -43,20 +39,19 @@
     },
     methods: {
       initLinks() {
-        this.urlAuthGoogle = "http://localhost:3000/auth/google?websocketClientId=" + this.websocketClientId;
-        this.urlAuthFacebook = "http://localhost:3000/auth/facebook?websocketClientId=" + this.websocketClientId;
+        this.urlAuthGoogle = "http://localhost:3000/google?websocketClientId=" + this.websocketClientId;
+        this.urlAuthFacebook = "http://localhost:3000/facebook?websocketClientId=" + this.websocketClientId;
         //this.urlAuthGoogle = "https://hotspottordev.wfn.ovh/auth/google?websocketClientId=" + this.websocketClientId;
         //this.urlAuthFacebook = "https://hotspottordev.wfn.ovh/auth/facebook?websocketClientId=" + this.websocketClientId;
       },
       authGoogle() {
         let url = "http://localhost:3000/auth/google";
         fetch(url, {
-          method: "POST",
           mode: "cors",
           headers: {
             "Access-Control-Allow-Origin": "*",
           },
-          body: JSON.stringify({ websocketClientId: this.websocketClientId }),
+          method: "GET",
         })
           .then((result) => console.log(result))
           .catch((error) => console.log(error));
@@ -64,24 +59,14 @@
       authFacebook() {
         let url = "http://localhost:3000/auth/facebook";
         fetch(url, {
-          method: "POST",
           mode: "cors",
           headers: {
             "Access-Control-Allow-Origin": "*",
           },
-          body: JSON.stringify({ websocketClientId: this.websocketClientId }),
+          method: "GET",
         })
           .then((result) => console.log(result))
           .catch((error) => console.log(error));
-      },
-      openRBSession(username, password) {
-        let authLoginRB = "http:/10.0.0.1/login";
-        fetch(authLoginRB, {
-          username: username,
-          password: password,
-          popup: "true",
-          dst: "https://www.wifinetcom.net",
-        });
       },
       connectToWebSocket() {
         //hotspotwfndev.wfn.ovh
