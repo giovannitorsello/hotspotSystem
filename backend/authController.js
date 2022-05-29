@@ -15,7 +15,7 @@ exports.google = (req, res) => {
     .then((ticket) => {
       if (req.session.websocketClientId) {
         websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
-        res.end();
+        res.redirect(config.passport.successRedirect);
       }
     })
     .catch((error) => console.log(error));
@@ -35,7 +35,7 @@ exports.facebook = (req, res) => {
     .then((ticket) => {
       if (req.session.websocketClientId) {
         websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
-        res.end();
+        res.redirect(config.passport.successRedirect);
       }
     })
     .catch((error) => console.log(error));
@@ -55,7 +55,7 @@ exports.twitter = (req, res) => {
     .then((ticket) => {
       if (req.session.websocketClientId) {
         websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
-        res.end();
+        res.redirect(config.passport.successRedirect);
       }
     })
     .catch((error) => console.log(error));
@@ -75,7 +75,7 @@ exports.github = (req, res) => {
     .then((ticket) => {
       if (req.session.websocketClientId) {
         websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
-        res.end();
+        res.redirect(config.passport.successRedirect);
       }
     })
     .catch((error) => console.log(error));

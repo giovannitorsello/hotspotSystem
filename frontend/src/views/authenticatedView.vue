@@ -18,17 +18,9 @@
         ticket: {},
       };
     },
-    created: function () {},
-    methods: {
-      /*openRBSession(username, password) {
-        let authLoginRB = "http:/10.0.0.1/login";
-        fetch(authLoginRB, {
-          username: username,
-          password: password,
-          popup: "true",
-          dst: "https://www.wifinetcom.net",
-        });
-      },*/
+    created: function () {
+      window.close();
     },
+    methods: {},
   };
 </script>

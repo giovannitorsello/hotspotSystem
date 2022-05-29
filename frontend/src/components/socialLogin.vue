@@ -1,28 +1,30 @@
 <template>
-  <div id="social_login">
-    <div id="login_choose" v-if="step == 0">
-      <div class="row mr-0">
-        <div class="col-md-6">
-          <a @click="authGoogle()" class="btn btn-outline-dark">
-            <img style="width: 20px !important" alt="Google sign-in" src="../assets/google.svg" />
-            Accedi con Google
-          </a>
-        </div>
+  <div id="login_choose">
+    <div class="row mr-0" v-if="!authenticated">
+      <div class="col-md-6">
+        <a @click="authGoogle()" class="btn btn-outline-dark">
+          <img style="width: 20px !important" alt="Google sign-in" src="../assets/google.svg" />
+          Accedi con Google
+        </a>
       </div>
+    </div>
 
-      <div class="row mr-0">
-        <div class="col-md-6">
-          <a @click="authFacebook()" class="btn btn-outline-dark" role="button" style="text-transform: none">
-            <img style="width: 20px !important" alt="Facebook sign-in" src="../assets/facebook.svg" />
-            Accedi con Facebook
-          </a>
-        </div>
+    <div class="row mr-0" v-if="!authenticated">
+      <div class="col-md-6">
+        <a @click="authFacebook()" class="btn btn-outline-dark" role="button" style="text-transform: none">
+          <img style="width: 20px !important" alt="Facebook sign-in" src="../assets/facebook.svg" />
+          Accedi con Facebook
+        </a>
       </div>
+    </div>
+    <div id="social_login_success" v-if="authenticated">
+      <p>Welcolme</p>
     </div>
   </div>
 </template>
 
 <script>
+  import config from "../../config.json";
   export default {
     data() {
       return {
@@ -32,24 +34,27 @@
         connection: null,
         authLink: "",
         authWindow: {},
+        authenticated: false,
       };
     },
     created: function () {
       this.connectToWebSocket();
     },
     methods: {
-      initLinks() {
-        //this.urlAuthGoogle = "http://hotspottordev.wfn.ovh:3000/google/auth?websocketClientId=" + this.websocketClientId;
-        //this.urlAuthFacebook = "http://hotspottordev.wfn.ovh:3000/facebook/auth?websocketClientId=" + this.websocketClientId;
-        //this.urlAuthGoogle = "https://hotspottordev.wfn.ovh/auth/google?websocketClientId=" + this.websocketClientId;
-        //this.urlAuthFacebook = "https://hotspottordev.wfn.ovh/auth/facebook?websocketClientId=" + this.websocketClientId;
-      },
       authGoogle() {
-        this.authLink = "http://hotspottordev.wfn.ovh:3000/google/auth?websocketClientId=" + this.websocketClientId;
+        this.authLink = config.api_server + "/google/auth?websocketClientId=" + this.websocketClientId;
         this.authWindow = window.open(this.authLink, "AuthWindow");
       },
       authFacebook() {
-        this.authLink = "http://hotspottordev.wfn.ovh:3000/facebook/auth?websocketClientId=" + this.websocketClientId;
+        this.authLink = config.api_server + "/facebook/auth?websocketClientId=" + this.websocketClientId;
+        this.authWindow = window.open(this.authLink, "AuthWindow");
+      },
+      authTwitter() {
+        this.authLink = config.api_server + "/twitter/auth?websocketClientId=" + this.websocketClientId;
+        this.authWindow = window.open(this.authLink, "AuthWindow");
+      },
+      authGithub() {
+        this.authLink = config.api_server + "/github/auth?websocketClientId=" + this.websocketClientId;
         this.authWindow = window.open(this.authLink, "AuthWindow");
       },
       openRBSession(username, password) {
@@ -83,7 +88,6 @@
           console.log("Object sent is: ", obj);
           if (obj.action === "connect" && obj.clientId) {
             vueComponent.websocketClientId = obj.clientId;
-            vueComponent.initLinks();
             console.log("ClientId assigned from server is: ", vueComponent.websocketClientId);
           }
 
@@ -91,8 +95,7 @@
             console.log("User authenticated and ticket produced");
             console.log("User profile:", obj.userProfile);
             console.log("User ticket:", obj.userTicket);
-            if (vueComponent.authWindow) vueComponent.authWindow.close();
-            alert("Social login success.");
+            vueComponent.authenticated = true;
             vueComponent.openRBSession(obj.userTicket.user, obj.userTicket.password);
           }
         };
