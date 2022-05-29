@@ -1,36 +1,107 @@
-exports.twitter = (req, res) => {
-  const io = req.app.get("io");
-  const user = {
-    name: req.user.username,
-    photo: req.user.photos[0].value.replace(/_normal/, ""),
-  };
-  io.in(req.session.socketId).emit("twitter", user);
-};
+const config = require("./config.js").load();
+const axios = require("axios");
 
 exports.google = (req, res) => {
-  const io = req.app.get("io");
-  const user = {
-    name: req.user.displayName,
-    photo: req.user.photos[0].value.replace(/sz=50/gi, "sz=250"),
+  const websocketServer = req.app.get("websocketServer");
+  const userProfile = {
+    socialId: req.user.id,
+    socialProvider: req.user.provider,
+    email: req.user._json.email,
+    locale: req.user._json.locale,
+    firstname: req.user.name.givenName,
+    lastname: req.user.name.familyName,
   };
-  io.in(req.session.socketId).emit("google", user);
+  generateTicket(userProfile)
+    .then((ticket) => {
+      if (req.session.websocketClientId) {
+        websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
+        res.end();
+      }
+    })
+    .catch((error) => console.log(error));
 };
 
 exports.facebook = (req, res) => {
-  const io = req.app.get("io");
-  const { givenName, familyName } = req.user.name;
-  const user = {
-    name: `${givenName} ${familyName}`,
-    photo: req.user.photos[0].value,
+  const websocketServer = req.app.get("websocketServer");
+  const userProfile = {
+    socialId: req.user.id,
+    socialProvider: req.user.provider,
+    email: req.user._json.email,
+    locale: req.user._json.locale,
+    firstname: req.user.name.givenName,
+    lastname: req.user.name.familyName,
   };
-  io.in(req.session.socketId).emit("facebook", user);
+  generateTicket(userProfile)
+    .then((ticket) => {
+      if (req.session.websocketClientId) {
+        websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
+        res.end();
+      }
+    })
+    .catch((error) => console.log(error));
+};
+
+exports.twitter = (req, res) => {
+  const websocketServer = req.app.get("websocketServer");
+  const userProfile = {
+    socialId: req.user.id,
+    socialProvider: req.user.provider,
+    email: req.user._json.email,
+    locale: req.user._json.locale,
+    firstname: req.user.name.givenName,
+    lastname: req.user.name.familyName,
+  };
+  generateTicket(userProfile)
+    .then((ticket) => {
+      if (req.session.websocketClientId) {
+        websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
+        res.end();
+      }
+    })
+    .catch((error) => console.log(error));
 };
 
 exports.github = (req, res) => {
-  const io = req.app.get("io");
-  const user = {
-    name: req.user.username,
-    photo: req.user.photos[0].value,
+  const websocketServer = req.app.get("websocketServer");
+  const userProfile = {
+    socialId: req.user.id,
+    socialProvider: req.user.provider,
+    email: req.user._json.email,
+    locale: req.user._json.locale,
+    firstname: req.user.name.givenName,
+    lastname: req.user.name.familyName,
   };
-  io.in(req.session.socketId).emit("github", user);
+  generateTicket(userProfile)
+    .then((ticket) => {
+      if (req.session.websocketClientId) {
+        websocketServer.sendMessage(req.session.websocketClientId, { state: "ok", type: "ticketGenerated", userProfile: userProfile, userTicket: ticket });
+        res.end();
+      }
+    })
+    .catch((error) => console.log(error));
 };
+
+function generateTicket(userProfile) {
+  return new Promise(function (resolve, reject) {
+    let url = config.ticket_server.url;
+    var urlObj = new URL(url);
+    var params = {
+      action: config.ticket_server.action,
+      firstname: userProfile.firstname,
+      lastname: userProfile.lastname,
+      phone: userProfile.socialProvider + "--" + userProfile.socialId,
+      email: userProfile.email,
+      days: config.ticket_server.days,
+      pin: config.ticket_server.pin,
+    };
+    urlObj.search = new URLSearchParams(params).toString();
+    axios(url + urlObj.search)
+      .then((result) => {
+        console.log("Il ticket server risponde: ", result.data);
+        resolve(result.data);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}

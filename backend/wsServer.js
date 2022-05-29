@@ -8,6 +8,7 @@ var GoogleStrategy = require("passport-google-oauth2").Strategy;
 var FacebookStrategy = require("passport-facebook").Strategy;
 
 const { response } = require("express");
+const { log } = require("console");
 var WebSocket = ws.WebSocket;
 var WebSocketServer = ws.WebSocketServer;
 
@@ -69,7 +70,7 @@ class wsServer {
       // Adding to clients map
       this.clients.set(client.clientId, client);
 
-      console.log("Connection with id: " + client.clientId + " has been open, IP is: " + req.socket.remoteAddress);
+      console.log("Connection with id: " + client.clientId + " has been open, IP is: " + client.ip);
       let msg = JSON.stringify({ action: "connect", state: "ok", clientId: client.clientId, msg: "Welcolme client!!!" });
       client.send(msg);
 
@@ -95,7 +96,11 @@ module.exports = {
   getServer() {
     return this.wsServer;
   },
-  sendMessage(message) {
-    wsServer.client.send(message);
+  sendMessage(clientId, message) {
+    let client = this.wsServer.clients.get(parseInt(clientId));
+    if (client) {
+      console.log("sending message: ", message);
+      client.send(JSON.stringify(message));
+    }
   },
 };

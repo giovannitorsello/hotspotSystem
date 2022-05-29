@@ -1,5 +1,5 @@
 <template>
-  <div id="social_login">
+  <div id="authenticated">
     <div id="Welcolme">
       <div class="row mr-0">
         <div class="col-md-6">
@@ -15,12 +15,12 @@
     data() {
       return {
         profile: {},
-        tiocket: {},
+        ticket: {},
       };
     },
     created: function () {},
     methods: {
-      openRBSession(username, password) {
+      /*openRBSession(username, password) {
         let authLoginRB = "http:/10.0.0.1/login";
         fetch(authLoginRB, {
           username: username,
@@ -28,7 +28,7 @@
           popup: "true",
           dst: "https://www.wifinetcom.net",
         });
-      },
+      },*/
     },
   };
 </script>

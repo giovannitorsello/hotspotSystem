@@ -9,6 +9,12 @@
         "certificateSSL": "/certs/hotspottordev.wfn.ovh/fullchain.pem",
         "privateKeySSL": "/certs/hotspottordev.wfn.ovh/privkey.pem"
     },
+    "ticket_server": {
+        "url": "http://wifiticket.wifinetcom.net:8080/WIFITicketSystem2/TicketServlet",
+        "action": "get_ticket",
+        "pin": "1111",
+        "days": 7
+    },
     "database": {
         "engine": "mysql",
         "database_host": "localhost",
@@ -17,6 +23,8 @@
         "database_name": "node_app"
     },
     "passport": {
+        "successRedirect": "http://hotspottordev.wfn.ovh:8080/#/authenticated",
+        "failRedirect": "http://hotspottordev.wfn.ovh:8080/#/failed",
         "google": {
             "clientID": "513774142824-t78vgfbfhcsba9katnv64uve4u00hb2f.apps.googleusercontent.com",
             "clientSecret": "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",

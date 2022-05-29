@@ -3,7 +3,7 @@
     <div id="login_choose" v-if="step == 0">
       <div class="row mr-0">
         <div class="col-md-6">
-          <a :href="urlAuthGoogle" class="btn btn-outline-dark">
+          <a @click="authGoogle()" class="btn btn-outline-dark">
             <img style="width: 20px !important" alt="Google sign-in" src="../assets/google.svg" />
             Accedi con Google
           </a>
@@ -12,7 +12,7 @@
 
       <div class="row mr-0">
         <div class="col-md-6">
-          <a :href="urlAuthFacebook" class="btn btn-outline-dark" role="button" style="text-transform: none">
+          <a @click="authFacebook()" class="btn btn-outline-dark" role="button" style="text-transform: none">
             <img style="width: 20px !important" alt="Facebook sign-in" src="../assets/facebook.svg" />
             Accedi con Facebook
           </a>
@@ -30,8 +30,8 @@
         socialUrl: "",
         websocketClientId: 0,
         connection: null,
-        urlAuthGoogle: "",
-        urlAuthFacebook: "",
+        authLink: "",
+        authWindow: {},
       };
     },
     created: function () {
@@ -39,40 +39,38 @@
     },
     methods: {
       initLinks() {
-        this.urlAuthGoogle = "http://localhost:3000/google?websocketClientId=" + this.websocketClientId;
-        this.urlAuthFacebook = "http://localhost:3000/facebook?websocketClientId=" + this.websocketClientId;
+        //this.urlAuthGoogle = "http://hotspottordev.wfn.ovh:3000/google/auth?websocketClientId=" + this.websocketClientId;
+        //this.urlAuthFacebook = "http://hotspottordev.wfn.ovh:3000/facebook/auth?websocketClientId=" + this.websocketClientId;
         //this.urlAuthGoogle = "https://hotspottordev.wfn.ovh/auth/google?websocketClientId=" + this.websocketClientId;
         //this.urlAuthFacebook = "https://hotspottordev.wfn.ovh/auth/facebook?websocketClientId=" + this.websocketClientId;
       },
       authGoogle() {
-        let url = "http://localhost:3000/auth/google";
-        fetch(url, {
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-          method: "GET",
-        })
-          .then((result) => console.log(result))
-          .catch((error) => console.log(error));
+        this.authLink = "http://hotspottordev.wfn.ovh:3000/google/auth?websocketClientId=" + this.websocketClientId;
+        this.authWindow = window.open(this.authLink, "AuthWindow");
       },
       authFacebook() {
-        let url = "http://localhost:3000/auth/facebook";
-        fetch(url, {
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-          method: "GET",
+        this.authLink = "http://hotspottordev.wfn.ovh:3000/facebook/auth?websocketClientId=" + this.websocketClientId;
+        this.authWindow = window.open(this.authLink, "AuthWindow");
+      },
+      openRBSession(username, password) {
+        let authLoginRB = "http:/10.0.0.1/login";
+        fetch(authLoginRB, {
+          username: username,
+          password: password,
+          popup: "true",
+          dst: "https://www.wifinetcom.net",
         })
-          .then((result) => console.log(result))
-          .catch((error) => console.log(error));
+          .then((result) => {
+            console.log("Rb session created", result);
+            window.open("https://www.wifinetcom.net");
+          })
+          .catch((error) => console.log("Error on Rb create session.", error));
       },
       connectToWebSocket() {
         //hotspotwfndev.wfn.ovh
         //hotspottordev.wfn.ovh
         var vueComponent = this;
-        this.connection = new WebSocket("wss://localhost:2021");
+        this.connection = new WebSocket("wss://hotspottordev.wfn.ovh:2021");
 
         this.connection.onmessage = function (event) {
           console.log("Message received from server");
@@ -89,8 +87,13 @@
             console.log("ClientId assigned from server is: ", vueComponent.websocketClientId);
           }
 
-          if (obj.action == "ticketGenerated" && obj.clientId) {
-            this.openRBSession(obj.data.username, obj.data.password);
+          if (obj.state && obj.state === "ok" && obj.type && obj.type == "ticketGenerated" && obj.userProfile && obj.userTicket) {
+            console.log("User authenticated and ticket produced");
+            console.log("User profile:", obj.userProfile);
+            console.log("User ticket:", obj.userTicket);
+            if (vueComponent.authWindow) vueComponent.authWindow.close();
+            alert("Social login success.");
+            vueComponent.openRBSession(obj.userTicket.user, obj.userTicket.password);
           }
         };
 

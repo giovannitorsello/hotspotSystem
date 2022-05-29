@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import LoginView from "../views/loginView.vue";
-import AutheticatedView from "../views/loginView.vue";
+import authenticatedView from "../views/authenticatedView.vue";
 
 const routes = [
   {
@@ -11,7 +11,7 @@ const routes = [
   {
     path: "/authenticated",
     name: "Welcolme",
-    component: AutheticatedView,
+    component: authenticatedView,
   },
 ];
 
