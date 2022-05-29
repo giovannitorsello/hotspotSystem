@@ -24,8 +24,8 @@ module.exports = {
     };
 
     passport.use(new GoogleStrategy(config.passport.google, callback));
-    //passport.use(new TwitterStrategy(config.passport.twitter, callback));
-    //passport.use(new FacebookStrategy(config.passport.facebook, callback));
-    //passport.use(new GithubStrategy(config.passport.github, callback));
+    passport.use(new TwitterStrategy(config.passport.twitter, callback));
+    passport.use(new FacebookStrategy(config.passport.facebook, callback));
+    passport.use(new GithubStrategy(config.passport.github, callback));
   },
 };

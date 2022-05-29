@@ -35,9 +35,19 @@
             "clientID": "529063895382205",
             "clientSecret": "5fdf8f61faf72389318c903a2531f53d",
             "callbackURL": "https://hotspottordev.wfn.ovh/facebook/callback",
-            "profileFields": ["id", "name", "displayName"],
             "passReqToCallback": true
-
+        },
+        "twitter": {
+            "consumerKey": "529063895382205",
+            "consumerSecret": "5fdf8f61faf72389318c903a2531f53d",
+            "callbackURL": "https://hotspottordev.wfn.ovh/twitter/callback",
+            "passReqToCallback": true
+        },
+        "github": {
+            "clientID": "529063895382205",
+            "clientSecret": "5fdf8f61faf72389318c903a2531f53d",
+            "callbackURL": "https://hotspottordev.wfn.ovh/github/callback",
+            "passReqToCallback": true
         }
     }
 }
